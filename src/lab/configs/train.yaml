@@ -4,11 +4,11 @@ hydra:
 
 defaults:
   - _self_
-  - dataset: mnist
+  - dataset: london
   - dataloader: default
   - transforms: default
-  - model: baseline
-  - criterion: ce
+  - model: calliper
+  - criterion: clip
   - metrics: default
   - optimizer: default
   - lr_scheduler: cosine
@@ -16,11 +16,10 @@ defaults:
 
 trainer:
   log_step: 100 # optimizer steps between train logs
-  log_images: 16 # images in the logged grid of predictions
   debug: false # true to measure data_time / step_time (synchronizes CUDA at each step)
   total_steps: 10000 # total optimizer steps
   eval_every_steps: 1000 # validation frequency; also defines metric reporting windows
-  device_tensors: ["img", "label"]
+  device_tensors: ["coords", "text_emb", "text_id"]
   resume_from: null # null or checkpoint file name inside checkpoint_dir (*.pth)
   from_pretrained: null # null or path to the model checkpoint (*.pth file)
   device: "auto" # device name or "auto"
@@ -32,11 +31,11 @@ trainer:
   skip_oom: true
   max_grad_norm: null
   grad_accum_steps: 1 # batches per optimizer step (effective batch size = batch_size * grad_accum_steps)
-  use_bfloat16: false
+  amp: null # null (full precision) or "bfloat16"
   compile: null # null (eager) or torch.compile kwargs, e.g. {mode: default, fullgraph: false}
   checkpoint_dir: ${writer.log_dir}/checkpoints
   seed: 42
   ema:
-    decay: 0.999
+    decay: 0
     update_every: 1
     warmup_steps: 0 # steps with linearly increasing decay (0 = disabled)

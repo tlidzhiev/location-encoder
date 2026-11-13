@@ -7,7 +7,7 @@ from lab.dataset.utils import get_dataloaders
 from lab.training.trainer import Trainer
 from lab.utils.init import set_random_seed, setup_saving_and_logging
 from lab.utils.io import get_root
-from lab.utils.optim import get_lr_scheduler
+from lab.utils.optim import get_lr_scheduler, get_param_groups
 
 
 @hydra.main(
@@ -42,10 +42,7 @@ def main(config: DictConfig) -> None:
     model = instantiate(config.model).to(device)
     logger.info(f'Model:\n{model}')
 
-    optimizer = instantiate(
-        config.optimizer,
-        params=[p for p in model.parameters() if p.requires_grad],
-    )
+    optimizer = instantiate(config.optimizer, params=get_param_groups(model), _convert_='all')
     logger.info(f'Optimizer:\n{optimizer}')
     lr_scheduler = get_lr_scheduler(
         config=config,

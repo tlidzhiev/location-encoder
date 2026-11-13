@@ -1,13 +1,13 @@
 train:
   _target_: torch.utils.data.DataLoader
-  batch_size: 128
+  batch_size: 1024 # contrastive loss: the larger the batch, the more negatives
   pin_memory: true
   shuffle: true
   drop_last: true
 
-test:
+val:
   _target_: torch.utils.data.DataLoader
-  batch_size: 256
+  batch_size: 1024 # the in-batch recall depends on the batch size
   pin_memory: true
   shuffle: false
   drop_last: false

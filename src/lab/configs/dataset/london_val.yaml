@@ -1,5 +1,6 @@
-test:
-  _target_: lab.dataset.mnist.MNISTDataset
-  split: test
+val:
+  _target_: lab.dataset.poi.POIDataset
+  city: london
+  split: val
   shuffle_index: false
   instance_transforms: ${transforms.instance_transforms.inference}

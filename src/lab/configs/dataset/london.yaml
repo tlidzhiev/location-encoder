@@ -1,11 +1,13 @@
 train:
-  _target_: lab.dataset.mnist.MNISTDataset
+  _target_: lab.dataset.poi.POIDataset
+  city: london
   split: train
-  shuffle_index: true
+  shuffle_index: false # the dataloader shuffles
   instance_transforms: ${transforms.instance_transforms.train}
 
-test:
-  _target_: lab.dataset.mnist.MNISTDataset
-  split: test
+val:
+  _target_: lab.dataset.poi.POIDataset
+  city: london
+  split: val
   shuffle_index: false
   instance_transforms: ${transforms.instance_transforms.inference}

@@ -4,16 +4,16 @@ hydra:
 
 defaults:
   - _self_
-  - dataset: mnist_test
+  - dataset: london_val
   - dataloader: default
   - transforms: default
-  - model: baseline
+  - model: calliper
   - metrics: default
 
 inferencer:
-  device_tensors: ["img", "label"]
+  device_tensors: ["coords", "text_emb", "text_id"]
   device: "auto"  # device name or "auto"
-  use_bfloat16: false
+  amp: null  # null (full precision) or "bfloat16"
   compile: null  # null (eager) or torch.compile kwargs, e.g. {mode: default, fullgraph: false}
   seed: 42
   from_pretrained: null  # path to the model checkpoint (*.pth file)

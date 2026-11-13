@@ -1,11 +1,24 @@
 from collections.abc import Callable
 from math import cos, pi
 
+import torch
 from omegaconf import DictConfig
+from torch import nn
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LambdaLR, LRScheduler
 
 _SCHEDULER_NAMES = ('constant', 'constant_warmup', 'cosine', 'cosine_warmup')
+
+
+def get_param_groups(model: nn.Module) -> list[dict]:
+    """
+    Trainable parameters in two groups: matrices with the weight decay of the optimizer, and
+    biases and scalars (such as the logit scale) without it.
+    """
+    params: list[torch.Tensor] = [p for p in model.parameters() if p.requires_grad]
+    decay = [p for p in params if p.ndim >= 2]
+    no_decay = [p for p in params if p.ndim < 2]
+    return [{'params': decay}, {'params': no_decay, 'weight_decay': 0.0}]
 
 
 def get_lr_scheduler(

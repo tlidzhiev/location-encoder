@@ -1,16 +1,16 @@
-# Research Project Template
+# Location Encoder
 
 <p align="center">
   <a href="#about">About</a> •
   <a href="#installation">Installation</a> •
+  <a href="#data">Data</a> •
   <a href="#how-to-use">How To Use</a> •
-  <a href="#examples">Examples</a> •
   <a href="#credits">Credits</a>
 </p>
 
 ## About
 
-This repository is a template for PyTorch research projects. It provides Hydra-based configs, a trainer with EMA, mixed precision (AMP), gradient accumulation, checkpointing, resuming and early stopping, an inferencer, and CometML experiment tracking. MNIST classification with a small MLP is included as a working example.
+Location encoders for geospatial representation learning: positional encodings, location networks and CLIP-style contrastive pre-training. The included example aligns the locations of places (POIs) with precomputed embeddings of their text descriptions, in the spirit of CaLLiPer.
 
 ## Installation
 
@@ -22,8 +22,8 @@ This repository is a template for PyTorch research projects. It provides Hydra-b
 
 ```bash
 # Clone the repository
-git clone https://github.com/tlidzhiev/research-project-template.git
-cd research-project-template
+git clone https://github.com/tlidzhiev/location-encoder.git
+cd location-encoder
 
 # Install uv (if not already installed)
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -39,6 +39,12 @@ uv sync
 pre-commit install
 ```
 
+The scripts that download and process the POI data need extra packages (geopandas, osmnx, ...):
+
+```bash
+uv sync --extra download
+```
+
 ### CometML Configuration
 
 CometML is used by default for experiment tracking. Create a `.comet.config` file in the project root:
@@ -52,6 +58,26 @@ project_name=YOUR_PROJECT_NAME
 
 The API key is only needed for online logging: `writer.mode` is `offline` by default.
 
+## Data
+
+Run the scripts in this order. Everything is stored under `data/<city>/`.
+
+```bash
+# 1. Download the POIs (OpenStreetMap, Overture Maps) -> data/<city>/raw/pois.csv
+uv run scripts/get_poi_data.py
+
+# 2. Filter them and make the spatial train / val split -> data/<city>/processed/{train,val}.csv
+uv run scripts/process_poi_data.py
+
+# 3. (optional) Draw a map of the split -> data/<city>/processed/split_map.png
+uv run scripts/plot_poi_split.py
+
+# 4. Embed every distinct text once with a frozen backbone -> data/<city>/processed/text_emb/
+uv run scripts/precompute_text_embeddings.py
+```
+
+The text backbone (Qwen3-Embedding-0.6B by default) is never trained and never runs during training: the model only learns a projection of the precomputed embeddings. Run each script with `--help` for the options.
+
 ## How To Use
 
 To run a script (training or inference), use the following command:
@@ -64,37 +90,7 @@ uv run <script> -cn=CONFIG_NAME HYDRA_CONFIG_ARGUMENTS
 - `CONFIG_NAME`: A config file from `src/lab/configs` (`train` and `inference` by default)
 - `HYDRA_CONFIG_ARGUMENTS`: Optional Hydra overrides
 
-MNIST is downloaded and indexed into `data/mnist` on the first run. Runs are saved to `logs/{project_name}/{run_name}`, with checkpoints in the `checkpoints` subdirectory.
-
-## Examples
-
-Train the baseline model with online logging:
-
-```bash
-uv run train writer.run_name=baseline writer.mode=online
-```
-
-Train with the best-checkpoint selection and early stopping on the test accuracy:
-
-```bash
-uv run train writer.run_name=baseline trainer.monitor="max test_AccuracyMetric" trainer.early_stop=3
-```
-
-Training runs for `trainer.total_steps` optimizer steps. Validation runs every
-`trainer.eval_every_steps`; periodic checkpoints are written after an evaluation when
-`trainer.checkpoint_every_steps` is reached. A new best checkpoint is saved after any
-evaluation that improves the monitored metric. Resume from a checkpoint of the same run:
-
-```bash
-uv run train writer.run_name=baseline trainer.resume_from=checkpoint-step-1000.pth
-```
-
-Evaluate the best checkpoint with the EMA weights and save the predictions to `data/saved/baseline`:
-
-```bash
-uv run inference inferencer.from_pretrained=logs/research-project-template/baseline/checkpoints/model-best.pth \
-  inferencer.use_ema=true inferencer.save_path=baseline
-```
+Runs are saved to `logs/{project_name}/{run_name}`, with checkpoints in the `checkpoints` subdirectory.
 
 ## Credits
 

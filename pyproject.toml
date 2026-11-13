@@ -1,7 +1,7 @@
 [project]
-name = "research-project-template"
+name = "location-encoder"
 version = "0.1.0"
-description = "Template for my research projects"
+description = "Location encoder"
 readme = "README.md"
 authors = [
     { name = "tlidzhiev", email = "trlidzhiev@gmail.com" }
@@ -14,13 +14,24 @@ dependencies = [
     "matplotlib==3.11.2",
     "numpy==2.5.4",
     "safetensors==0.8.0",
+    "sentence-transformers==6.2.0",
     "torch==2.15.0",
     "torchmetrics==1.9.0",
     "torchvision==0.29.2",
     "tqdm==4.70.1",
+    "transformers==5.22.1",
 ]
 
 [dependency-groups]
+download = [
+    "geopandas==1.2.0",
+    "osmnx==2.1.1",
+    "overturemaps==1.0.2",
+    "pandas==3.1.0",
+    "pyarrow==26.0.0",
+    "rapidfuzz==3.14.6",
+    "shapely==2.2.0",
+]
 dev = [
     "ipykernel==7.4.0",
     "ipywidgets==8.1.9",

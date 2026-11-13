@@ -1,0 +1,17 @@
+_target_: lab.model.calliper.Calliper
+positional_encoding:
+  _target_: lab.model.modules.positional_encoding.GridPositionEncoder
+  min_radius: 10 # meters (OSGB coordinates)
+  max_radius: 100000
+  frequency_num: 32 # output size is 2 * 2 * frequency_num = 128
+location_encoder:
+  _target_: lab.model.modules.location_encoder.Space2Vec
+  input_dim: 128 # must equal the output size of the positional encoding
+  hidden_dim: 256
+  num_layers: 4
+  output_dim: 256
+  activation: relu
+text_encoder:
+  _target_: lab.model.modules.text_encoder.PrecomputedTextEncoder
+  input_dim: 1024 # Qwen3-Embedding-0.6B, or the --truncate-dim of the precompute script
+  output_dim: ${model.location_encoder.output_dim}

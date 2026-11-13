@@ -1,5 +1,5 @@
 _target_: lab.logger.cometml.CometMLWriter
-project_name: research-project-template
+project_name: location-encoder
 run_name: test
 workspace: null # your cometml username or team name
 run_id: null # set to resume a specific run

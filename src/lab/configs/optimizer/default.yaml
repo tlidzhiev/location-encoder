@@ -1,2 +1,3 @@
-_target_: torch.optim.Adam
+_target_: torch.optim.AdamW
 lr: 1.0e-3
+weight_decay: 0.01 # not applied to biases and the logit scale
