@@ -200,7 +200,10 @@ class BaseTrainer(BaseRunner):
         """
         cfg = self.cfg_trainer
         while self.global_step < cfg.total_steps:
-            window_steps = min(cfg.eval_every_steps, cfg.total_steps - self.global_step)
+            # Windows end on multiples of 'eval_every_steps', so after resuming from a step
+            # inside a window, the evaluations and checkpoints stay on the same steps
+            steps_to_eval = cfg.eval_every_steps - self.global_step % cfg.eval_every_steps
+            window_steps = min(steps_to_eval, cfg.total_steps - self.global_step)
             train_logs = self._train_window(window_steps)
             logs = {
                 'step': self.global_step,
